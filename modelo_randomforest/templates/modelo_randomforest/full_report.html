@@ -1,0 +1,70 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>RandomForest - Full Report</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body{padding:20px;background:#fafafa}
+    pre { background:#000; color:#0f0; padding:10px; border-radius:6px; overflow:auto }
+    .img-box { margin:10px 0; border:1px solid #ddd; padding:10px; background:#fff }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Full RandomForest Report</h1>
+    <p>Shape: <strong>{{ shape.0 }} rows × {{ shape.1 }} cols</strong></p>
+    <p>Elapsed training: <strong>{{ elapsed }}s</strong> | Accuracy: <strong>{{ accuracy }}</strong></p>
+    <a class="btn btn-primary" href="{% url 'download_model' %}">Download model (.joblib)</a>
+    <a class="btn btn-secondary" href="{% url 'download_report' %}">Download results JSON</a>
+    <hr>
+
+    <h3>Dataset info (dtypes)</h3>
+    <pre>{{ dtypes|safe }}</pre>
+
+    <h3>Missing values (per column)</h3>
+    <pre>{{ missing|safe }}</pre>
+
+    <h3>Head (first 10 rows)</h3>
+    <div class="table-responsive">{{ head_html|safe }}</div>
+
+    <h3>Tail (last 10 rows)</h3>
+    <div class="table-responsive">{{ tail_html|safe }}</div>
+
+    <h3>Describe (numeric)</h3>
+    <div class="table-responsive">{{ describe_num|safe }}</div>
+
+    <h3>Describe (all)</h3>
+    <div class="table-responsive">{{ describe_all|safe }}</div>
+
+    <h3>Training stdout</h3>
+    <pre>{{ stdout }}</pre>
+
+    <h3>Classification Report</h3>
+    <div class="table-responsive">{{ report_html|safe }}</div>
+
+    <h3>Confusion matrix</h3>
+    <div class="img-box"><img src="data:image/png;base64,{{ b64_cm }}" class="img-fluid"></div>
+
+    <h3>Feature importances (top)</h3>
+    <div class="img-box"><img src="data:image/png;base64,{{ b64_fi }}" class="img-fluid"></div>
+    <p>Full importances CSV: <a href="{{ importances_full_csv }}">{{ importances_full_csv }}</a></p>
+
+    <h3>Correlation (numeric)</h3>
+    <div class="img-box"><img src="data:image/png;base64,{{ b64_corr }}" class="img-fluid"></div>
+
+    <h3>Class distribution</h3>
+    <div class="img-box"><img src="data:image/png;base64,{{ b64_dist }}" class="img-fluid"></div>
+
+    {% if b64_roc %}
+      <h3>ROC Curves</h3>
+      <div class="img-box"><img src="data:image/png;base64,{{ b64_roc }}" class="img-fluid"></div>
+    {% endif %}
+
+    {% if b64_pr %}
+      <h3>Precision-Recall Curves</h3>
+      <div class="img-box"><img src="data:image/png;base64,{{ b64_pr }}" class="img-fluid"></div>
+    {% endif %}
+  </div>
+</body>
+</html>

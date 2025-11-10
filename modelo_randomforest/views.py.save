@@ -1,5 +1,7 @@
 from django.shortcuts import render
 import pandas as pd
+import matplotlib
+matplotlib.use('Agg')  # Para evitar problemas en servidores sin entorno gráfico
 import matplotlib.pyplot as plt
 import io
 import base64
@@ -8,44 +10,56 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report, confusion_matrix
 
 def index(request):
-    # 1️⃣ Cargar el dataset (coloca tu CSV dentro de /modelo_randomforest/static/)
-    df = pd.read_csv('modelo_randomforest/static/TotalFeatures-ISCXFlowMeter.csv')
+    # Ruta del dataset (colócalo en modelo_randomforest/static/)
+    csv_path = 'modelo_randomforest/static/TotalFeatures-ISCXFlowMeter.csv'
 
-    # 2️⃣ Mostrar información general
-    dataset_info = df.describe().to_html(classes='table table-bordered', border=0)
+    # Verificar que el archivo exista
+    try:
+        df = pd.read_csv(csv_path)
+    except Exception as e:
+        return render(request, 'index.html', {'error': f"No se pudo leer el CSV: {e}"})
+
+    # Información general
     primeras_filas = df.head(10).to_html(classes='table table-striped', border=0)
+    dataset_info = df.describe().to_html(classes='table table-bordered', border=0)
 
-    # 3️⃣ Preparar datos
+    # Entrenamiento del modelo
+    if 'calss' not in df.columns:
+        return render(request, 'index.html', {'error': "No se encontró la columna 'calss' en el dataset."})
+
     X = df.drop('calss', axis=1)
     y = df['calss']
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-    # 4️⃣ Entrenar modelo RandomForest
     model = RandomForestClassifier(n_estimators=100, random_state=42)
     model.fit(X_train, y_train)
     y_pred = model.predict(X_test)
 
-    # 5️⃣ Métricas
-    reporte = classification_report(y_test, y_pred, output_dict=True)
+    # Reporte de métricas
+    reporte = classification_report(y_test, y_pred)
     matriz_conf = confusion_matrix(y_test, y_pred)
 
-    # 6️⃣ Generar gráfica
+    # Crear gráfica
     plt.figure(figsize=(5, 4))
     plt.imshow(matriz_conf, cmap='Blues')
     plt.title('Matriz de Confusión')
     plt.colorbar()
+    plt.xlabel('Predicción')
+    plt.ylabel('Valor Real')
 
-    # Convertir la gráfica a imagen para mostrarla en HTML
     buf = io.BytesIO()
     plt.savefig(buf, format='png')
     buf.seek(0)
     image_base64 = base64.b64encode(buf.read()).decode('utf-8')
     buf.close()
 
-    return render(request, 'index.html', {
+    context = {
         'primeras_filas': primeras_filas,
         'dataset_info': dataset_info,
         'reporte': reporte,
         'image_base64': image_base64,
-    })
+    }
+
+    return render(request, 'index.html', context)
+

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Resultados del Modelo Random Forest</title>
+  <style>
+    body { font-family: Arial; margin: 40px; background: #fafafa; color: #222; }
+    h1, h2, h3 { color: #0d47a1; }
+    table { border-collapse: collapse; width: 100%; margin-bottom: 30px; }
+    table, th, td { border: 1px solid #ccc; }
+    th, td { padding: 8px; text-align: center; }
+    img { max-width: 100%; border-radius: 8px; margin: 20px 0; }
+    .metricas { font-size: 1.1em; background: #e3f2fd; padding: 10px; border-radius: 8px; }
+  </style>
+</head>
+<body>
+  <h1>Resultados del Modelo Random Forest</h1>
+
+  <h2>📘 Información del Dataset</h2>
+  <p><b>Filas:</b> {{ dataset_info.filas }} | <b>Columnas:</b> {{ dataset_info.columnas }}</p>
+  <p><b>Columnas:</b> {{ dataset_info.columnas_nombres }}</p>
+
+  <h2>📊 Primeras 10 Filas</h2>
+  {{ primeras_filas|safe }}
+
+  <h2>📈 Estadísticas Descriptivas</h2>
+  {{ stats|safe }}
+
+  <h2>🔢 Métricas del Modelo</h2>
+  <div class="metricas">
+    {% for key, value in metrics.items %}
+      <b>{{ key }}:</b> {{ value|floatformat:4 }}<br>
+    {% endfor %}
+  </div>
+
+  <h2>📄 Reporte de Clasificación</h2>
+  {{ classification_report|safe }}
+
+  <h2>🧩 Matriz de Confusión</h2>
+  <img src="data:image/png;base64,{{ conf_matrix_img }}" alt="Matriz de Confusión">
+
+  <h2>🔥 Importancia de Características</h2>
+  <img src="data:image/png;base64,{{ feature_importance_img }}" alt="Importancia de Características">
+
+  <h2>🎯 Distribución de Clases</h2>
+  <img src="data:image/png;base64,{{ class_distribution_img }}" alt="Distribución de Clases">
+
+  <h2>📉 Matriz de Correlación</h2>
+  <img src="data:image/png;base64,{{ correlation_img }}" alt="Matriz de Correlación">
+</body>
+</html>
