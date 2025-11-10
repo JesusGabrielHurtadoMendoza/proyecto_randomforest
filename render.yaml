@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: proyecto-randomforest
+    env: python
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn mi_proyecto.wsgi:application"
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: mi_proyecto.settings
+      - key: PYTHON_VERSION
+        value: 3.12

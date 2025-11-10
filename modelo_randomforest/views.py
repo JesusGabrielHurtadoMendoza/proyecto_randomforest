@@ -16,11 +16,26 @@ from sklearn.metrics import (
     f1_score
 )
 
+import requests
+import os
+import pandas as pd
+
 def index(request):
-    # =======================
-    # 1️⃣ CARGAR EL DATASET
-    # =======================
-    df = pd.read_csv('TotalFeatures-ISCXFlowMeter.csv')
+    # URL de descarga directa
+    url = "https://drive.google.com/uc?export=download&id=1lfOIXsQfaRNyB-VLiGbTtX5qq5DkDHoQ"
+    local_filename = os.path.join(os.path.dirname(__file__), 'TotalFeatures-ISCXFlowMeter.csv')
+
+    # Si el archivo no existe localmente, lo descarga
+    if not os.path.exists(local_filename):
+        r = requests.get(url, stream=True)
+        with open(local_filename, 'wb') as f:
+            for chunk in r.iter_content(chunk_size=8192):
+                if chunk:
+                    f.write(chunk)
+
+    # Ahora carga con pandas
+    df = pd.read_csv(local_filename)
+    # … resto de tu código …
 
     # Mostrar información general del dataset
     dataset_info = {
